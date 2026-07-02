@@ -1,8 +1,9 @@
 # Cantonese Learner — v2 (mobile)
 
 > **This is the mobile/iPhone-friendly version 2.** It's a fork of the desktop
-> app with a phone-friendly layout and an iOS-tuned recording mode. The original
-> desktop version lives at
+> app with a phone-friendly layout and — because iOS browsers can't do in-page
+> speech recognition — an **on-device audio-recording + transcription** path so
+> recording works on iPhone. The original desktop version lives at
 > [`cantonese-learner`](https://github.com/lyhjeremy/cantonese-learner) and is
 > left untouched.
 
@@ -19,11 +20,19 @@ read it aloud, and the app tells you — character by character — how you did.
 
 No sign-up, no install, no keys. Just open the link on your phone.
 
-**Speaking/scoring by device:** works on **desktop Chrome** and — new in v2 —
-uses a **single-shot recognition mode on iPhone/iPad** (Safari & Chrome on iOS)
-so Record no longer instantly fails. iOS speech recognition is still Apple's and
-can be limited, so on iOS it captures one utterance at a time (it ends when you
-pause) and accuracy varies. Listening and reading work in every browser.
+**Speaking / scoring, by device:**
+
+- **Desktop (Chrome):** the browser's built-in speech recognition — instant, no
+  download.
+- **iPhone / iPad (Safari or Chrome):** iOS browsers don't support in-page speech
+  recognition, so v2 **records your voice and transcribes it with a small speech
+  model that runs on the phone**. Tap **Record** to start, speak, tap **Stop** to
+  finish. The first time, it downloads the model (**~40 MB, one time, then
+  cached**) and takes a few seconds to transcribe. You'll be asked for
+  microphone permission — allow it. Cantonese accuracy is rough (the model leans
+  Mandarin; the lenient/homophone scoring softens that).
+
+Listening and reading work in every browser.
 
 ![The reader](docs/reader-light.png)
 

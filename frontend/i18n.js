@@ -37,6 +37,31 @@ export const STR = {
   },
   score: { en: "Score", hant: "分數", hans: "分数" },
   heard: { en: "Heard", hant: "聽到", hans: "听到" },
+  recording: {
+    en: "🔴 Recording… tap Stop when you're done",
+    hant: "🔴 錄音緊…講完㩒「停止」",
+    hans: "🔴 录音中…讲完按「停止」",
+  },
+  loadingModel: {
+    en: "Preparing the voice model…",
+    hant: "準備緊語音模型…",
+    hans: "准备语音模型…",
+  },
+  downloadingModel: {
+    en: (p) => `Downloading voice model… ${p}% (one time)`,
+    hant: (p) => `下載緊語音模型… ${p}%（只需一次）`,
+    hans: (p) => `下载语音模型… ${p}%（只需一次）`,
+  },
+  transcribing: {
+    en: "Transcribing your speech…",
+    hant: "轉換緊你嘅語音…",
+    hans: "转换你的语音…",
+  },
+  micBlocked: {
+    en: "Microphone unavailable — allow mic access, then tap Record again.",
+    hant: "無法使用麥克風 — 請允許麥克風權限，再㩒錄音。",
+    hans: "无法使用麦克风 — 请允许麦克风权限，再按录音。",
+  },
   readOriginal: { en: "Read original at source", hant: "閱讀原文", hans: "阅读原文" },
   loading: { en: "Loading today's lessons…", hant: "載入緊今日課程…", hans: "载入今日课程…" },
   offlineDemo: {

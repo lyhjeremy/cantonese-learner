@@ -4,7 +4,8 @@
 
 import { LANGS, LANG_LABELS, t } from "./i18n.js";
 import { initTts, speak, stopSpeaking, voiceName } from "./tts.js";
-import { gradeText, asrAvailable, listen } from "./grader.js";
+import { gradeText, asrAvailable, listen, isIOSLike } from "./grader.js";
+import { canRecordAudio, recordAndTranscribe } from "./voice-model.js";
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, cls, text) => {
@@ -46,7 +47,8 @@ const state = {
   article: null,
   idx: 0,
   tts: { available: false, voices: {} },
-  asrOk: asrAvailable(),
+  asrOk: asrAvailable(), // native SpeechRecognition (desktop)
+  canRecord: canRecordAudio(), // MediaRecorder + on-device model (iPhone path)
   recording: null,
 };
 
@@ -267,28 +269,73 @@ function clearFeedback() {
   fb.innerHTML = "";
 }
 
-async function record() {
-  if (!state.asrOk || state.recording) return;
+// Toggle the record button between "Record" and "Stop" so it's clear you press
+// once to start and again to finish (same button, two states).
+function setRecording(on) {
   const btn = $("#btn-record");
-  btn.classList.add("active");
+  btn.classList.toggle("active", on);
+  if (!on) btn.classList.remove("live");
+  btn.querySelector(".lbl").textContent = t(on ? "stop" : "record", state.lang);
+}
+
+function showStatus(text) {
   const fb = $("#feedback");
   fb.hidden = false;
   fb.innerHTML = "";
-  fb.appendChild(el("div", "status", t("listening", state.lang)));
+  fb.appendChild(el("div", "status", text));
+}
 
-  state.recording = listen({
-    lang: "yue-Hant-HK",
-    onStart: () => btn.classList.add("live"),
-  });
-  const heard = await state.recording.promise;
-  state.recording = null;
-  btn.classList.remove("active", "live");
-
+function finishTranscript(heard) {
   const s = state.article.sentences[state.idx];
   const result = gradeText(forScript(s.colloquial || s.formal), heard, normalizeChar, jyutpingOf);
   showFeedback(result, heard);
   renderReader(result.marks); // repaint colloquial with green/amber/red marks
   // No auto-advance — the learner moves on manually with Next (→) when ready.
+}
+
+async function record() {
+  if (state.recording) return;
+  // iPhone/iPad (or any browser without working speech recognition) records
+  // audio and transcribes on-device; desktop uses the fast native recogniser.
+  const useModel = (isIOSLike() || !state.asrOk) && state.canRecord;
+
+  if (useModel) {
+    setRecording(true);
+    showStatus(t("recording", state.lang));
+    const rec = recordAndTranscribe({
+      lang: "chinese",
+      onStart: () => $("#btn-record").classList.add("live"),
+      onStatus: (stage, info) => {
+        if (stage === "model") showStatus(t("loadingModel", state.lang));
+        else if (stage === "download") showStatus(t("downloadingModel", state.lang, info && info.progress ? Math.round(info.progress) : 0));
+        else if (stage === "transcribe") showStatus(t("transcribing", state.lang));
+      },
+    });
+    state.recording = rec;
+    let heard = "";
+    try {
+      heard = await rec.promise;
+    } catch {
+      state.recording = null;
+      setRecording(false);
+      showStatus(t("micBlocked", state.lang));
+      return;
+    }
+    state.recording = null;
+    setRecording(false);
+    finishTranscript(heard);
+    return;
+  }
+
+  if (!state.asrOk) return;
+  setRecording(true);
+  showStatus(t("listening", state.lang));
+  const rec = listen({ lang: "yue-Hant-HK", onStart: () => $("#btn-record").classList.add("live") });
+  state.recording = rec;
+  const heard = await rec.promise;
+  state.recording = null;
+  setRecording(false);
+  finishTranscript(heard);
 }
 
 function stopRecord() {
@@ -327,7 +374,8 @@ function updateControls() {
   $("#script-sel").value = state.script;
   $("#script-sel").disabled = !openccOk;
   $("#btn-play").disabled = !state.tts.available;
-  $("#btn-record").hidden = !state.asrOk;
+  // Record works via native recognition (desktop) OR on-device model (iPhone).
+  $("#btn-record").hidden = !(state.asrOk || state.canRecord);
 
   // Degradation notes: no voice at all, OR only a non-Cantonese fallback voice.
   const noteTts = $("#note-tts");
@@ -340,7 +388,8 @@ function updateControls() {
   } else {
     noteTts.hidden = true;
   }
-  $("#note-asr").hidden = state.asrOk;
+  // Only warn that scoring is unavailable if NEITHER path works.
+  $("#note-asr").hidden = state.asrOk || state.canRecord;
   $("#note-asr").textContent = t("noAsr", state.lang);
 }
 
