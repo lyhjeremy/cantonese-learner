@@ -303,7 +303,6 @@ async function record() {
     setRecording(true);
     showStatus(t("recording", state.lang));
     const rec = recordAndTranscribe({
-      lang: "chinese",
       onStart: () => $("#btn-record").classList.add("live"),
       onStatus: (stage, info) => {
         if (stage === "model") showStatus(t("loadingModel", state.lang));

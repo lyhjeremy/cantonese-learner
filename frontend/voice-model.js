@@ -9,12 +9,29 @@
 // this path), so desktop and initial page load stay light.
 
 const TRANSFORMERS_CDN = "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2";
-const MODEL_ID = "Xenova/whisper-tiny"; // multilingual; smallest usable Whisper
+const MODEL_ID = "Xenova/whisper-base"; // bigger than tiny — better accuracy, fewer hallucinations
+const CANTONESE_LANG = "yue"; // ask Whisper for Cantonese (not Mandarin); fall back to generic Chinese if unsupported
 
 let tfModulePromise = null;
 function tf() {
   if (!tfModulePromise) tfModulePromise = import(/* @vite-ignore */ TRANSFORMERS_CDN);
   return tfModulePromise;
+}
+
+// Transcribe, asking for Cantonese. Whisper tiny/base have no Cantonese
+// language token (only large-v3 does), so if this model rejects it we remember
+// that and use generic Chinese from then on.
+let cantoneseSupported = true;
+async function transcribe(transcriber, audio) {
+  if (cantoneseSupported) {
+    try {
+      return await transcriber(audio, { language: CANTONESE_LANG, task: "transcribe" });
+    } catch (e) {
+      cantoneseSupported = false;
+      console.warn("[voice-model] Cantonese language unsupported by this model; using generic Chinese.", String(e));
+    }
+  }
+  return transcriber(audio, { language: "chinese", task: "transcribe" });
 }
 
 let transcriberPromise = null;
@@ -41,7 +58,7 @@ export function canRecordAudio() {
 // the captured audio on-device. Returns { promise, stop }.
 //   onStart(): mic is live (show "Recording…")
 //   onStatus(stage, info): 'model' | 'download'(+progress) | 'transcribe'
-export function recordAndTranscribe({ onStart, onStatus, lang = "chinese" } = {}) {
+export function recordAndTranscribe({ onStart, onStatus } = {}) {
   const ctl = { recorder: null, stream: null, stopRequested: false };
 
   const promise = (async () => {
@@ -75,7 +92,7 @@ export function recordAndTranscribe({ onStart, onStatus, lang = "chinese" } = {}
     try {
       const { read_audio } = await tf();
       const audio = await read_audio(url, 16000); // decode + resample to 16kHz mono
-      const out = await transcriber(audio, { language: lang, task: "transcribe" });
+      const out = await transcribe(transcriber, audio);
       return ((out && out.text) || "").trim();
     } finally {
       URL.revokeObjectURL(url);

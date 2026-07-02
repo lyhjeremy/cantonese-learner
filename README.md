@@ -25,12 +25,16 @@ No sign-up, no install, no keys. Just open the link on your phone.
 - **Desktop (Chrome):** the browser's built-in speech recognition — instant, no
   download.
 - **iPhone / iPad (Safari or Chrome):** iOS browsers don't support in-page speech
-  recognition, so v2 **records your voice and transcribes it with a small speech
-  model that runs on the phone**. Tap **Record** to start, speak, tap **Stop** to
-  finish. The first time, it downloads the model (**~40 MB, one time, then
-  cached**) and takes a few seconds to transcribe. You'll be asked for
-  microphone permission — allow it. Cantonese accuracy is rough (the model leans
-  Mandarin; the lenient/homophone scoring softens that).
+  recognition, so v2 **records your voice and transcribes it with a speech model
+  that runs on the phone** (Whisper `base`). Tap **Record** to start, speak, tap
+  **Stop** to finish. The first time, it downloads the model (**one time, then
+  cached**) and takes a few seconds to transcribe. You'll be asked for microphone
+  permission — allow it.
+  - *Accuracy note:* phone-sized Whisper models don't have a dedicated Cantonese
+    mode (only Whisper `large-v3` does, which is far too big for a phone), so this
+    transcribes in Whisper's generic **Chinese** (Mandarin-leaning). The
+    lenient/homophone scoring softens the mismatch, but for truly accurate
+    Cantonese a cloud recognizer (`yue-HK`) is the only good option (needs a key).
 
 Listening and reading work in every browser.
 
