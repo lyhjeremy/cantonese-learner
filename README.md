@@ -73,8 +73,10 @@ That's the whole thing. Everything below is for the curious and the technical.
   into spoken Cantonese, adds the jyutping, and saves the result.
 - The website is just static files, so it loads instantly and costs nothing to
   host.
-- Your **voice never leaves your computer for storage** — the listening, the
-  speaking, and the scoring all happen right in your browser.
+- Everything runs **in your browser** — no accounts, and nothing is uploaded to
+  us. (On a **phone**, even the speech-to-text runs on the device itself; on
+  **desktop Chrome**, recognition uses the browser's built-in web speech service,
+  same as any website dictation.)
 
 ---
 
@@ -93,8 +95,9 @@ GitHub Actions (daily cron, free)                     Browser (GitHub Pages, fre
 │ 1. fetch RTHK RSS (5 topics)        │                │ loads today.json               │
 │ 2. fetch each full article body     │  writes        │ • side-by-side reader + ruby   │
 │ 3. rewrite → spoken Cantonese       │  today.json    │ • speechSynthesis TTS (zh-HK)  │
-│ 4. add jyutping (to-jyutping)       │ ─────────────▶ │ • SpeechRecognition grading    │
-│ 5. bake into the Pages deploy       │   (in deploy)  │ • trad⇄simp, tri-lingual UI    │
+│ 4. add jyutping (to-jyutping)       │ ─────────────▶ │ • scoring: native (desktop) or │
+│ 5. bake into the Pages deploy       │   (in deploy)  │   on-device Whisper (iPhone)   │
+│                                     │                │ • trad⇄simp, tri-lingual UI    │
 └────────────────────────────────────┘                └──────────────────────────────┘
 ```
 
@@ -142,20 +145,29 @@ This is the heart of the app, and there are **two modes**:
 Either way, **jyutping is always computed locally** by the `to-jyutping` library,
 so it's accurate and free regardless of the rewrite mode.
 
-### Speaking + listening — the browser's own speech engine
+### Speaking + scoring — two paths, chosen by device
 
-- **Text-to-speech** uses the browser's built-in `speechSynthesis` with a
-  Cantonese (`zh-HK`) voice — free, on-device, no key. It re-resolves the voice
-  fresh on every play to dodge a Chrome bug where a cached voice silently reverts
-  to English, and it shows you *which* voice is being used. If no Cantonese voice
-  exists it falls back to any Chinese voice and says so.
-- **Speech recognition** uses the browser's `SpeechRecognition` (`yue-Hant-HK`),
-  which today means **Chrome**. Where it's unavailable, the grading UI hides
-  itself and listening/reading still work.
-- **Recording is patient.** It gives you up to 8 seconds to *start* speaking and
-  tolerates ~3.5-second pauses mid-sentence (so you can think between characters),
-  and you end it yourself by pressing `R` again. It never cuts you off after one
-  word.
+- **Playback (text-to-speech)** uses the browser's built-in `speechSynthesis`
+  with a Cantonese (`zh-HK`) voice — free, on-device, no key. It re-resolves the
+  voice fresh on every play to dodge a Chrome bug where a cached voice silently
+  reverts to English. If no Cantonese voice exists it falls back to any Chinese
+  voice and says so.
+- **Recording + transcription differs by device** (`grader.js` picks the path via
+  an iOS check):
+  - **Desktop (Chrome):** the browser's native `SpeechRecognition`
+    (`yue-Hant-HK`) — instant, no download. Recording is patient: ~8 s to *start*,
+    ~3.5 s pause tolerance mid-sentence, and you end it by pressing `R` again.
+  - **iPhone/iPad (and any browser without native recognition):** iOS browsers
+    can't do in-page recognition, so the app records audio with `MediaRecorder`
+    and transcribes it **on-device** with a Whisper model (`base`) via
+    transformers.js — lazy-loaded from a CDN and cached after the first use
+    (`frontend/voice-model.js`). Explicit **Record → Stop**. *Limitation:*
+    phone-sized Whisper has no dedicated Cantonese mode (only `large-v3` does,
+    which is too big for a phone), so it transcribes generic, Mandarin-leaning
+    Chinese; the leniency below compensates. Truly accurate Cantonese would need
+    a cloud `yue-HK` recognizer (key + small cost).
+- Where neither path is available, the scoring UI hides itself and
+  listening/reading still work.
 
 ### Scoring — lenient on purpose
 
@@ -225,9 +237,10 @@ cron (06:00 HKT) to refresh the news.
   hosting and Actions are free at this scale. No server, no database, no paid API
   in the running app — nothing to patch, host, or rotate.
 - **Your friends cost you nothing.** Everything runs in *their* browser:
-  text-to-speech uses their device's own Cantonese voice, and speech scoring uses
-  Chrome's built-in recognition. **No key or account of yours is ever used when
-  someone uses the app** — whether 1 friend or 1,000, it stays $0.
+  text-to-speech uses their device's own Cantonese voice, and speech scoring runs
+  in their browser too (desktop: Chrome's built-in recognition; iPhone: a small
+  model on their phone). **No key or account of yours is ever used when someone
+  uses the app** — whether 1 friend or 1,000, it stays $0.
 - **Keep-alive.** GitHub disables scheduled workflows after 60 days with no new
   commits, which would silently stop the daily update.
   [`.github/workflows/keepalive.yml`](.github/workflows/keepalive.yml) makes a
@@ -237,10 +250,11 @@ cron (06:00 HKT) to refresh the news.
   public feeds. If RTHK changes them, the build **fails soft** — the site serves
   the bundled *sample* lessons instead of going blank. A glance at the banner
   (it shows today's date) confirms it's healthy.
-- **What your friends need.** A Cantonese voice on their device for playback —
+- **What your friends need.** For playback: a Cantonese voice on their device —
   Apple devices include "Sinji"; some Windows/Android setups don't, in which case
-  Play simply hides itself and reading/scoring still work. The speaking/scoring
-  feature needs **Chrome**; reading works in any browser.
+  Play hides itself. For scoring: on **desktop** use **Chrome**; on
+  **iPhone/iPad** use Safari or Chrome (it downloads a small speech model once).
+  Reading works in any browser.
 - **The optional Claude rewrite is the only thing that could ever cost money** —
   it's **off by default**. If you enable it (below), the *daily build* calls
   Claude once per day (a few cents/day regardless of traffic); set a monthly cap
@@ -284,7 +298,9 @@ npm run validate:data
 frontend/        the static site (GitHub Pages)
   index.html     reader UI
   app.js         reader, transport, toggles, tri-lingual UI, data loading
-  grader.js      speech recognition + lenient char grading (script/register/homophone)
+  grader.js      native speech recognition (desktop) + lenient char grading
+                 (script / register / homophone); iOS detection
+  voice-model.js iPhone path: record audio + on-device Whisper transcription
   tts.js         zh-HK text-to-speech with voice re-resolution
   i18n.js        English / Traditional / Simplified labels
   data/          sample-lessons.json (offline fallback), jyutping.json (homophone dict),
