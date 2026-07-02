@@ -1,13 +1,10 @@
-# Cantonese Learner — v2 (mobile)
+# Cantonese Learner
 
-> **This is the mobile/iPhone-friendly version 2.** It's a fork of the desktop
-> app with a phone-friendly layout and — because iOS browsers can't do in-page
-> speech recognition — an **on-device audio-recording + transcription** path so
-> recording works on iPhone. The original desktop version lives at
-> [`cantonese-learner`](https://github.com/lyhjeremy/cantonese-learner) and is
-> left untouched.
+**Learn to *speak* Cantonese from today's real Hong Kong news.** Works on
+**desktop and mobile** (iPhone/iPad included).
 
-**Learn to *speak* Cantonese from today's real Hong Kong news.**
+> The earlier desktop-only build is archived at
+> [`cantonese-learner-old`](https://github.com/lyhjeremy/cantonese-learner-old).
 
 Every day the app pulls a fresh batch of genuine RTHK news stories — local Hong
 Kong news, Greater China, world, finance, and sport — and turns each one into a
@@ -16,7 +13,7 @@ left, and the way a **Hong Kong TV anchor would say it** on the right, with
 **jyutping** (romanised pronunciation) above every character. You listen, you
 read it aloud, and the app tells you — character by character — how you did.
 
-**▶️ Try it now: https://lyhjeremy.github.io/cantonese-learner-v2/**
+**▶️ Try it now: https://lyhjeremy.github.io/cantonese-learner/**
 
 No sign-up, no install, no keys. Just open the link on your phone.
 
