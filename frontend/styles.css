@@ -176,17 +176,44 @@ body {
 .feedback { margin: 10px 0 2px; }
 
 /* ── Mobile / touch (v2) ─────────────────────────────────────────────────────
-   Bigger tap targets, header wrapping, and iPhone safe-area insets so the app
-   is comfortable on a phone. */
+   Compact everything so the written pane, the spoken pane, the score, and the
+   transport buttons all fit on one phone screen without scrolling. Smaller
+   fonts, tighter panes, single-row buttons, and desktop-only chrome hidden. */
 @media (max-width: 560px) {
-  .topbar { flex-wrap: wrap; gap: 10px; padding-top: max(12px, env(safe-area-inset-top)); }
-  .brand h1 { font-size: 21px; }
-  .wrap { padding-left: max(14px, env(safe-area-inset-left)); padding-right: max(14px, env(safe-area-inset-right)); }
-  .pane-body { max-height: 34vh; }
-  .transport { gap: 8px; }
-  .tbtn { min-width: 0; flex: 1 1 28%; padding: 13px 8px; } /* fill the row, easy to tap */
-  .tbtn .lbl { font-size: 15px; }
-  .tbtn .key { font-size: 10px; }
-  .toggles { gap: 14px; }
-  .foot { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+  .topbar { flex-wrap: wrap; gap: 8px; padding: max(10px, env(safe-area-inset-top)) 14px 4px; }
+  .brand h1 { font-size: 19px; }
+  .tagline { display: none; } /* free a line */
+  .wrap { padding: 4px max(12px, env(safe-area-inset-left)) 8px max(12px, env(safe-area-inset-right)); }
+
+  .reader-head { margin: 4px 0 8px; gap: 10px; }
+  .reader-title { font-size: 17px; }
+  .reader-sub { font-size: 12px; }
+  .counter { font-size: 12px; }
+
+  .panes { gap: 8px; }
+  .pane-label { padding: 6px 12px; font-size: 10px; }
+  .pane-body { max-height: 23vh; padding: 8px 12px; line-height: 1.9; } /* both panes fit */
+  .para { margin: 0 0 7px; }
+
+  /* smaller characters so both panes stay visible at once */
+  .formal .sentence, .colloquial .sentence { font-size: 17px; }
+  .formal .sentence.current { font-size: 20px; }
+  .cc { font-size: 17px; }
+  .colloquial .sentence.current .cc { font-size: 20px; }
+  .colloquial .plain { font-size: 17px; }
+
+  .feedback { margin: 6px 0 2px; padding: 8px 12px; }
+  .heard { font-size: 15px; }
+
+  /* transport: one compact row; hide keyboard hints (irrelevant on touch) */
+  .transport { gap: 6px; margin: 8px 0 6px; flex-wrap: nowrap; }
+  .tbtn { min-width: 0; flex: 1 1 0; padding: 9px 4px; border-radius: 12px; }
+  .tbtn .key { display: none; }
+  .tbtn .lbl { font-size: 13px; }
+
+  .toggles { gap: 12px; margin: 4px 0; font-size: 13px; }
+  .toggle select { padding: 5px 8px; }
+
+  .kbd-hint { display: none; } /* desktop keyboard-shortcut hint */
+  .foot { display: none; } /* reclaim the last line on a phone */
 }
