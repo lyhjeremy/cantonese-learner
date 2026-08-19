@@ -1,15 +1,15 @@
-// voice-model.js (v2) — record real audio with MediaRecorder, then transcribe it
+// voice-model.js (v2): record real audio with MediaRecorder, then transcribe it
 // ON-DEVICE with a small Whisper model (transformers.js). This is the path used
 // on iPhone/iPad, where the browser SpeechRecognition API doesn't work. It needs
 // a one-time model download (~40MB, cached by the browser afterwards) and runs
-// entirely in the page — no server, no key.
+// entirely in the page, no server, no key.
 //
 // getUserMedia + MediaRecorder work on iOS Safari (14.3+); the model download +
 // inference are lazy (only when the learner first records on a device that needs
 // this path), so desktop and initial page load stay light.
 
 const TRANSFORMERS_CDN = "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2";
-const MODEL_ID = "Xenova/whisper-base"; // bigger than tiny — better accuracy, fewer hallucinations
+const MODEL_ID = "Xenova/whisper-base"; // bigger than tiny: better accuracy, fewer hallucinations
 const CANTONESE_LANG = "yue"; // ask Whisper for Cantonese (not Mandarin); fall back to generic Chinese if unsupported
 
 let tfModulePromise = null;

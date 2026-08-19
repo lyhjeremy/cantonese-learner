@@ -1,4 +1,4 @@
-// app.js — the karaoke reader: data loading, side-by-side panes, jyutping ruby,
+// app.js. The karaoke reader: data loading, side-by-side panes, jyutping ruby,
 // transport, toggles, keyboard shortcuts, tri-lingual UI, and graceful
 // degradation for missing TTS / speech-recognition.
 
@@ -136,7 +136,7 @@ function renderList() {
     meta.appendChild(el("span", "src", a.source || ""));
     meta.appendChild(el("span", "cnt", `${a.sentences.length} · ${t("colloquial", state.lang)}`));
     card.appendChild(meta);
-    // "Unavailable" only when a real rewrite backend failed — not for the
+    // "Unavailable" only when a real rewrite backend failed, not for the
     // rule-based path, where no-change just means nothing needed swapping.
     if (a.converted === false && a.method !== "rules" && state.lessons.method !== "rules") {
       card.appendChild(el("div", "warn", t("conversionUnavailable", state.lang)));
@@ -175,7 +175,7 @@ function renderColloquial(sentence, marks) {
   chars.forEach((ch, i) => {
     const isCjk = /[㐀-䶿一-鿿豈-﫿]/.test(ch);
     // Each character is a uniform, fixed-width cell: jyutping row on top, glyph
-    // below — consistent gaps regardless of jyutping length.
+    // below, consistent gaps regardless of jyutping length.
     const cell = el("span", "cc" + (isCjk ? "" : " punct"));
     cell.appendChild(el("span", "jp", isCjk ? jy[i] || "" : ""));
     cell.appendChild(el("span", "hz", ch));
@@ -290,7 +290,7 @@ function finishTranscript(heard) {
   const result = gradeText(forScript(s.colloquial || s.formal), heard, normalizeChar, jyutpingOf);
   showFeedback(result, heard);
   renderReader(result.marks); // repaint colloquial with green/amber/red marks
-  // No auto-advance — the learner moves on manually with Next (→) when ready.
+  // No auto-advance. The learner moves on manually with Next (→) when ready.
 }
 
 async function record() {
@@ -347,7 +347,7 @@ function showFeedback(result, heard) {
   fb.innerHTML = "";
   const pct = Math.round(result.accuracy * 100);
   const row = el("div", "score-row");
-  // Informational only — colour is a gentle cue, not a pass/fail gate.
+  // Informational only. Colour is a gentle cue, not a pass/fail gate.
   const badge = el("span", "score" + (pct >= 80 ? " good" : " mid"), `${t("score", state.lang)}: ${pct}%`);
   row.appendChild(badge);
   fb.appendChild(row);
@@ -394,7 +394,7 @@ function updateControls() {
 
 function applyTheme() {
   document.documentElement.dataset.theme = state.theme;
-  $("#theme-btn").textContent = state.theme === "dark" ? "☀︎" : "☾";
+  $("#theme-btn").textContent = state.theme === "dark" ? "Light" : "Dark";
 }
 
 function renderLangButtons() {

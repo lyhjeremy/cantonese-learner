@@ -1,32 +1,37 @@
 # Cantonese Learner
 
+> **Superseded.** This is the earlier version. Active development is in [cantonese-learner-v2](https://github.com/lyhjeremy/cantonese-learner-v2), and the published page here redirects there. The source below is kept for reference.
+
+
+Design and copy follow [these standards](https://github.com/lyhjeremy/lyhjeremy/blob/main/DESIGN_STANDARDS.md).
+
 **Learn to *speak* Cantonese from today's real Hong Kong news.** Works on
 **desktop and mobile** (iPhone/iPad included).
 
 > The earlier desktop-only build is archived at
 > [`cantonese-learner-old`](https://github.com/lyhjeremy/cantonese-learner-old).
 
-Every day the app pulls a fresh batch of genuine RTHK news stories — local Hong
-Kong news, Greater China, world, finance, and sport — and turns each one into a
+Every day the app pulls a fresh batch of genuine RTHK news stories, local Hong
+Kong news, Greater China, world, finance, and sport, and turns each one into a
 **karaoke-style speaking lesson**. You see the news the way it's written on the
 left, and the way a **Hong Kong TV anchor would say it** on the right, with
 **jyutping** (romanised pronunciation) above every character. You listen, you
-read it aloud, and the app tells you — character by character — how you did.
+read it aloud, and the app tells you, character by character, how you did.
 
-**▶️ Try it now: https://lyhjeremy.github.io/cantonese-learner/**
+**▶ Try it now: https://lyhjeremy.github.io/cantonese-learner/**
 
 No sign-up, no install, no keys. Just open the link on your phone.
 
 **Speaking / scoring, by device:**
 
-- **Desktop (Chrome):** the browser's built-in speech recognition — instant, no
+- **Desktop (Chrome):** the browser's built-in speech recognition: instant, no
   download.
 - **iPhone / iPad (Safari or Chrome):** iOS browsers don't support in-page speech
   recognition, so v2 **records your voice and transcribes it with a speech model
   that runs on the phone** (Whisper `base`). Tap **Record** to start, speak, tap
   **Stop** to finish. The first time, it downloads the model (**one time, then
   cached**) and takes a few seconds to transcribe. You'll be asked for microphone
-  permission — allow it.
+  permission, allow it.
   - *Accuracy note:* phone-sized Whisper models don't have a dedicated Cantonese
     mode (only Whisper `large-v3` does, which is far too big for a phone), so this
     transcribes in Whisper's generic **Chinese** (Mandarin-leaning). The
@@ -41,19 +46,19 @@ Listening and reading work in every browser.
 
 ## Who it's for
 
-Someone who reads Chinese comfortably but wants to *speak* Cantonese — using
+Someone who reads Chinese comfortably but wants to *speak* Cantonese, using
 real, current news in plain, natural spoken Hong Kong style, not a textbook.
 
 ## How you use it
 
 1. Open the link. You'll see today's ~12 news articles as cards.
 2. Tap one. It opens as a side-by-side reader:
-   - **Left** — the news in written Chinese.
-   - **Right** — the same thing rewritten in spoken Cantonese, with **jyutping**
+   - **Left.** The news in written Chinese.
+   - **Right.** The same thing rewritten in spoken Cantonese, with **jyutping**
      over every character so you know how to pronounce it.
 3. For each sentence:
    - Press **Play** (or `Space`) to hear it read aloud.
-   - Press **Record** (or `R`) and read it aloud yourself. Take your time —
+   - Press **Record** (or `R`) and read it aloud yourself. Take your time,
      press `R` again when you're done.
    - Each character lights up **green** (spot on), **amber** (right sound, close
      enough), or **red** (missed), with an overall score.
@@ -73,7 +78,7 @@ That's the whole thing. Everything below is for the curious and the technical.
   into spoken Cantonese, adds the jyutping, and saves the result.
 - The website is just static files, so it loads instantly and costs nothing to
   host.
-- Everything runs **in your browser** — no accounts, and nothing is uploaded to
+- Everything runs **in your browser.** No accounts, and nothing is uploaded to
   us. (On a **phone**, even the speech-to-text runs on the device itself; on
   **desktop Chrome**, recognition uses the browser's built-in web speech service,
   same as any website dictation.)
@@ -108,7 +113,7 @@ GitHub Actions (daily cron, free)                     Browser (GitHub Pages, fre
   set of curated sample lessons. If a browser lacks a Cantonese voice or speech
   recognition, those features hide themselves and the rest keeps working.
 
-### News source — RTHK RSS, keyless
+### News source: RTHK RSS, keyless
 
 - Uses **RTHK's free public RSS feeds** (no API key) across five topics: **本地**
   (Hong Kong local), **兩岸** (Greater China), **國際** (world), **財經**
@@ -131,10 +136,10 @@ GitHub Actions (daily cron, free)                     Browser (GitHub Pages, fre
 This is the heart of the app, and there are **two modes**:
 
 1. **Rule-based (default, keyless).** A hand-built converter applies the
-   well-known written→spoken swaps — 是→係, 的→嘅, 了→咗, 不→唔, 沒有→冇, 現在→而家,
-   我們→我哋, and so on — using a single-pass, longest-match scan that protects
-   compounds (e.g. the 不 in 不過 isn't mangled). It's rough — it swaps vocabulary
-   but doesn't restructure grammar — and it's honest about it (the UI shows a
+   well-known written→spoken swaps, 是→係，的→嘅，了→咗，不→唔，沒有→冇，現在→而家,
+   我們→我哋, and so on, using a single-pass, longest-match scan that protects
+   compounds (e.g. the 不 in 不過 isn't mangled). It's rough, it swaps vocabulary
+   but doesn't restructure grammar, and it's honest about it (the UI shows a
    "rule-based" banner). It costs nothing and needs no key.
 2. **Claude (optional, higher quality).** If you add an `ANTHROPIC_API_KEY` as a
    GitHub Actions secret, the daily build instead rewrites each sentence with
@@ -145,22 +150,22 @@ This is the heart of the app, and there are **two modes**:
 Either way, **jyutping is always computed locally** by the `to-jyutping` library,
 so it's accurate and free regardless of the rewrite mode.
 
-### Speaking + scoring — two paths, chosen by device
+### Speaking + scoring: two paths, chosen by device
 
 - **Playback (text-to-speech)** uses the browser's built-in `speechSynthesis`
-  with a Cantonese (`zh-HK`) voice — free, on-device, no key. It re-resolves the
+  with a Cantonese (`zh-HK`) voice, free, on-device, no key. It re-resolves the
   voice fresh on every play to dodge a Chrome bug where a cached voice silently
   reverts to English. If no Cantonese voice exists it falls back to any Chinese
   voice and says so.
 - **Recording + transcription differs by device** (`grader.js` picks the path via
   an iOS check):
   - **Desktop (Chrome):** the browser's native `SpeechRecognition`
-    (`yue-Hant-HK`) — instant, no download. Recording is patient: ~8 s to *start*,
+    (`yue-Hant-HK`). Instant, no download. Recording is patient: ~8 s to *start*,
     ~3.5 s pause tolerance mid-sentence, and you end it by pressing `R` again.
   - **iPhone/iPad (and any browser without native recognition):** iOS browsers
     can't do in-page recognition, so the app records audio with `MediaRecorder`
     and transcribes it **on-device** with a Whisper model (`base`) via
-    transformers.js — lazy-loaded from a CDN and cached after the first use
+    transformers.js, lazy-loaded from a CDN and cached after the first use
     (`frontend/voice-model.js`). Explicit **Record → Stop**. *Limitation:*
     phone-sized Whisper has no dedicated Cantonese mode (only `large-v3` does,
     which is too big for a phone), so it transcribes generic, Mandarin-leaning
@@ -169,23 +174,23 @@ so it's accurate and free regardless of the rewrite mode.
 - Where neither path is available, the scoring UI hides itself and
   listening/reading still work.
 
-### Scoring — lenient on purpose
+### Scoring: lenient on purpose
 
 Browser Cantonese recognition is imperfect, so the grader is built to **not
 punish a correct read**. It aligns what you said against the target with an
 edit-distance alignment (so one missed character doesn't cascade), then accepts a
 character as correct under three kinds of leniency:
 
-- **Script** — Traditional vs Simplified is normalised (學 == 学), via OpenCC.
-- **Register** — if the recogniser returns the *standard-written* form of a
-  spoken word (是 for 係, 了 for 咗…), that still counts.
-- **Homophones (同音字)** — if you pronounce a character correctly but the
+- **Script.** Traditional vs Simplified is normalised (學 == 学), via OpenCC.
+- **Register.** If the recogniser returns the *standard-written* form of a
+  spoken word (是 for 係，了 for 咗…), that still counts.
+- **Homophones (同音字).** If you pronounce a character correctly but the
   recogniser hears a *different character with the same/similar sound*, it still
   counts (shown amber). This uses a bundled **toneless jyutping dictionary**
   (~27k characters, generated from `to-jyutping`), matched toneless so tone
   confusion is forgiven too.
 
-There is **no pass/fail gate and no auto-advance** — the score and colours are
+There is **no pass/fail gate and no auto-advance.** The score and colours are
 feedback only; you decide when to move on. (Earlier versions auto-advanced at a
 threshold; that was removed once recording became a deliberate press-to-finish
 action.)
@@ -206,7 +211,7 @@ action.)
 
 ## Run it locally
 
-No build step for the site itself — it's plain HTML/CSS/JS.
+No build step for the site itself. It's plain HTML/CSS/JS.
 
 ```bash
 npm install          # only needed for tests / the news builder
@@ -227,7 +232,7 @@ cron (06:00 HKT) to refresh the news.
 
 ## Hosting, cost & maintenance
 
-**It runs itself, for free — there's essentially nothing to maintain.**
+**It runs itself, for free, there's essentially nothing to maintain.**
 
 - **Daily updates, hands-off.** Every morning at **06:00 Hong Kong time**
   (`cron: "0 22 * * *"` UTC) the Actions job re-fetches RTHK, rebuilds the
@@ -235,27 +240,27 @@ cron (06:00 HKT) to refresh the news.
   normal.)
 - **Cost: $0.** It's a static site on GitHub Pages from a public repo, so both
   hosting and Actions are free at this scale. No server, no database, no paid API
-  in the running app — nothing to patch, host, or rotate.
+  in the running app, nothing to patch, host, or rotate.
 - **Your friends cost you nothing.** Everything runs in *their* browser:
   text-to-speech uses their device's own Cantonese voice, and speech scoring runs
   in their browser too (desktop: Chrome's built-in recognition; iPhone: a small
   model on their phone). **No key or account of yours is ever used when someone
-  uses the app** — whether 1 friend or 1,000, it stays $0.
+  uses the app**, whether 1 friend or 1,000, it stays $0.
 - **Keep-alive.** GitHub disables scheduled workflows after 60 days with no new
   commits, which would silently stop the daily update.
   [`.github/workflows/keepalive.yml`](.github/workflows/keepalive.yml) makes a
   tiny commit twice a month so that never happens. (If it ever does stop,
   re-enable it once in the repo's **Actions** tab.)
 - **What can break, and how it fails safe.** The daily build depends on RTHK's
-  public feeds. If RTHK changes them, the build **fails soft** — the site serves
+  public feeds. If RTHK changes them, the build **fails soft.** The site serves
   the bundled *sample* lessons instead of going blank. A glance at the banner
   (it shows today's date) confirms it's healthy.
-- **What your friends need.** For playback: a Cantonese voice on their device —
+- **What your friends need.** For playback: a Cantonese voice on their device:
   Apple devices include "Sinji"; some Windows/Android setups don't, in which case
   Play hides itself. For scoring: on **desktop** use **Chrome**; on
   **iPhone/iPad** use Safari or Chrome (it downloads a small speech model once).
   Reading works in any browser.
-- **The optional Claude rewrite is the only thing that could ever cost money** —
+- **The optional Claude rewrite is the only thing that could ever cost money**:
   it's **off by default**. If you enable it (below), the *daily build* calls
   Claude once per day (a few cents/day regardless of traffic); set a monthly cap
   in the Anthropic console.
@@ -263,7 +268,7 @@ cron (06:00 HKT) to refresh the news.
 ## Optional upgrade: natural rewrite via Claude
 
 To swap the rough rule-based rewrite for **Claude Opus 4.8** (much more natural
-Cantonese), add one secret — no code change, no other service:
+Cantonese), add one secret, no code change, no other service:
 
 1. GitHub repo → **Settings → Secrets and variables → Actions → New secret**
 2. Name it `ANTHROPIC_API_KEY`, value = your Anthropic API key
@@ -283,14 +288,14 @@ npm run test:unit  # non-browser tests only
 npm run validate:data
 ```
 
-- **Chunking / RSS / rewrite** — CJK sentence chunking & packing, RSS parse +
+- **Chunking / RSS / rewrite.** CJK sentence chunking & packing, RSS parse +
   full-body extraction + newsworthiness scoring, rule-based conversion
   (longest-match, compound protection), and the optional Claude call (mocked).
-- **Grader** — edit-distance alignment (one miss doesn't cascade), script
+- **Grader.** Edit-distance alignment (one miss doesn't cascade), script
   normalisation, register leniency, and homophone leniency.
-- **Browser e2e (Playwright)** — renders sample + live lessons, jyutping ruby,
+- **Browser e2e (Playwright).** Renders sample + live lessons, jyutping ruby,
   navigation, live Trad→Simp conversion, and graceful degradation when speech
-  recognition is unavailable — each with a deterministically routed data source.
+  recognition is unavailable. Each with a deterministically routed data source.
 
 ## Repository layout
 
@@ -319,4 +324,4 @@ tests/           node:test unit tests + Playwright e2e
 
 See [`CANTONESE_FINANCE_LEARNER_OVERVIEW.md`](./CANTONESE_FINANCE_LEARNER_OVERVIEW.md)
 for the original project brief (note: the built app differs from that spec in
-several places — this README describes what was actually built).
+several places. This README describes what was actually built).

@@ -1,8 +1,8 @@
-// convert-rules.js — KEYLESS, rule-based formal-written -> spoken-Cantonese
+// convert-rules.js: KEYLESS, rule-based formal-written -> spoken-Cantonese
 // conversion. A pragmatic COMPROMISE for running with no Claude API key: it
-// applies well-known written->spoken lexical swaps (是->係, 不->唔, 沒有->冇,
-// 現在->而家, 我們->我哋 …). Rougher than an LLM rewrite — it won't restructure
-// grammar — but it makes the text read/sound noticeably more Cantonese.
+// applies well-known written->spoken lexical swaps (是->係，不->唔，沒有->冇,
+// 現在->而家，我們->我哋 …). Rougher than an LLM rewrite, it won't restructure
+// grammar, but it makes the text read/sound noticeably more Cantonese.
 //
 // Implementation: a SINGLE left-to-right longest-match pass over a combined
 // rule table. Multi-character keys are tried before shorter ones at each

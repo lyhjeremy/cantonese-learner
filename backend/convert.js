@@ -1,10 +1,10 @@
-// convert.js — the core new subsystem: formal written Chinese -> spoken
+// convert.js. The core new subsystem: formal written Chinese -> spoken
 // (HK TV-news-anchor) Cantonese, via Claude Haiku. Called ONCE per article per
 // day, server-side, cached. Never from the browser.
 
 import { chunkTextForLearning } from "./chunk.js";
 
-// Opus 4.8 — Anthropic's most capable model, for the highest-quality rewrite.
+// Opus 4.8: Anthropic's most capable model, for the highest-quality rewrite.
 // (Cost is a few cents/day at 5 articles; the owner sets a monthly cap.)
 export const CONVERT_MODEL = "claude-opus-4-8";
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
@@ -28,11 +28,11 @@ export function paragraphsToUnits(body) {
 
 const SYSTEM_PROMPT = `You rewrite formal written Chinese finance news into spoken Hong Kong TV-news-anchor Cantonese, and romanise it in jyutping.
 
-Register: exactly how a Hong Kong TV news anchor SPEAKS a bulletin aloud — natural spoken Cantonese with spoken words/particles where an anchor would use them (係, 嘅, 咗, 呢個, 而家, 話…), but still polished. NOT stiff read-off-the-page written Chinese, and NOT street slang.
+Register: exactly how a Hong Kong TV news anchor SPEAKS a bulletin aloud: natural spoken Cantonese with spoken words/particles where an anchor would use them (係，嘅，咗，呢個，而家，話…), but still polished. NOT stiff read-off-the-page written Chinese, and NOT street slang.
 
 Rules:
 - Keep numbers, company names, financial terms and meaning EXACTLY.
-- Output one colloquial sentence per formal sentence, in the same order — strict 1:1 alignment.
+- Output one colloquial sentence per formal sentence, in the same order, strict 1:1 alignment.
 - jyutping is an array with ONE entry per character of the colloquial sentence, in order. For non-Chinese characters (punctuation, digits, spaces, Latin letters) use an empty string "".
 - Output STRICT JSON only. No prose, no markdown fences.
 
@@ -54,10 +54,10 @@ export function parseStrictJson(text) {
 }
 
 // Translate an array of formal sentences to spoken Cantonese (colloquial text
-// only — jyutping is computed locally by the build). Returns an aligned array of
+// only, jyutping is computed locally by the build). Returns an aligned array of
 // strings, or null on any failure / misalignment so the caller can fall back to
 // the rule-based converter. Used by the keyless build when an ANTHROPIC_API_KEY
-// is present (opt-in higher-quality rewrite). No temperature/top_p — those are
+// is present (opt-in higher-quality rewrite). No temperature/top_p. Those are
 // rejected on Opus 4.8.
 export async function translateColloquial(formals, apiKey, opts = {}, fetchImpl = fetch) {
   if (!apiKey || !formals || !formals.length) return null;
