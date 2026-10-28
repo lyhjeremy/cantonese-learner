@@ -5,14 +5,14 @@
 
 Design and copy follow [these standards](https://github.com/lyhjeremy/lyhjeremy/blob/main/DESIGN_STANDARDS.md).
 
-**Learn to *speak* Cantonese from today's real Hong Kong news.** Works on
+**Learn to *speak* Cantonese from today's Hong Kong news.** Works on
 **desktop and mobile** (iPhone/iPad included).
 
 > The earlier desktop-only build is archived at
 > [`cantonese-learner-old`](https://github.com/lyhjeremy/cantonese-learner-old).
 
-Every day the app pulls a fresh batch of genuine RTHK news stories, local Hong
-Kong news, Greater China, world, finance, and sport, and turns each one into a
+Every day the app pulls a fresh batch of RTHK news stories (local Hong
+Kong news, Greater China, world, finance, and sport) and turns each one into a
 **karaoke-style speaking lesson**. You see the news the way it's written on the
 left, and the way a **Hong Kong TV anchor would say it** on the right, with
 **jyutping** (romanised pronunciation) above every character. You listen, you
@@ -20,7 +20,7 @@ read it aloud, and the app tells you, character by character, how you did.
 
 **▶ Try it now: https://lyhjeremy.github.io/cantonese-learner/**
 
-No sign-up, no install, no keys. Just open the link on your phone.
+There is nothing to sign up for, install or configure; open the link on your phone.
 
 **Speaking / scoring, by device:**
 
@@ -35,8 +35,8 @@ No sign-up, no install, no keys. Just open the link on your phone.
   - *Accuracy note:* phone-sized Whisper models don't have a dedicated Cantonese
     mode (only Whisper `large-v3` does, which is far too big for a phone), so this
     transcribes in Whisper's generic **Chinese** (Mandarin-leaning). The
-    lenient/homophone scoring softens the mismatch, but for truly accurate
-    Cantonese a cloud recognizer (`yue-HK`) is the only good option (needs a key).
+    lenient/homophone scoring softens the mismatch, but accurate
+    Cantonese recognition needs a cloud recognizer (`yue-HK`) and a key.
 
 Listening and reading work in every browser.
 
@@ -47,7 +47,7 @@ Listening and reading work in every browser.
 ## Who it's for
 
 Someone who reads Chinese comfortably but wants to *speak* Cantonese, using
-real, current news in plain, natural spoken Hong Kong style, not a textbook.
+current news in plain, natural spoken Hong Kong style in place of a textbook.
 
 ## How you use it
 
@@ -87,7 +87,7 @@ That's the whole thing. Everything below is for the curious and the technical.
 
 ## Design decisions (the technical part)
 
-This project deliberately optimises for **"a real person can run and use it with
+This project deliberately optimizes for **"anyone can run and use it with
 zero setup and zero cost."** Almost every decision below follows from that. Where
 the original spec assumed paid or heavy infrastructure, it was swapped for a
 free, browser- or Actions-based equivalent, with graceful fallbacks throughout.
@@ -122,14 +122,14 @@ GitHub Actions (daily cron, free)                     Browser (GitHub Pages, fre
 - The RSS summary is short, so for each chosen story the build **fetches the full
   article page and extracts the body** (`itemFullText`) for a proper multi-
   sentence lesson.
-- **Balanced selection.** Rather than take the "top 12" (which would be mostly
-  finance), the build ranks each topic's stories by a *newsworthiness* heuristic
-  (down-weights number-heavy market tickers, up-weights real-news vocabulary) and
+- **Balanced selection.** Taking the "top 12" would give mostly
+  finance, so the build ranks each topic's stories by a *newsworthiness* heuristic
+  (down-weights number-heavy market tickers, up-weights general-news vocabulary) and
   then **round-robins across topics**, guaranteeing a spread of ~12 varied
   lessons a day.
 - **The headline is never spoken.** The article title is shown as the reader
   heading only; the recording/grading uses the article *body*, starting from its
-  first real sentence.
+  first full sentence.
 
 ### The rewrite: written Chinese → spoken Cantonese
 
@@ -139,11 +139,11 @@ This is the heart of the app, and there are **two modes**:
    well-known written→spoken swaps, 是→係，的→嘅，了→咗，不→唔，沒有→冇，現在→而家,
    我們→我哋, and so on, using a single-pass, longest-match scan that protects
    compounds (e.g. the 不 in 不過 isn't mangled). It's rough, it swaps vocabulary
-   but doesn't restructure grammar, and it's honest about it (the UI shows a
-   "rule-based" banner). It costs nothing and needs no key.
+   but doesn't restructure grammar, and the UI says so with a
+      "rule-based" banner. It costs nothing and needs no key.
 2. **Claude (optional, higher quality).** If you add an `ANTHROPIC_API_KEY` as a
    GitHub Actions secret, the daily build instead rewrites each sentence with
-   **Claude Opus 4.8** for genuinely natural anchor-Cantonese, and the "rough"
+   **Claude Opus 4.8** for natural anchor-Cantonese, and the "rough"
    banner disappears. Cost is a few cents/day at ~12 articles. See *Optional
    upgrade* below. **No key → it stays fully keyless.**
 
@@ -239,8 +239,8 @@ cron (06:00 HKT) to refresh the news.
   lessons, and redeploys. (GitHub's scheduler can be a few minutes late; that's
   normal.)
 - **Cost: $0.** It's a static site on GitHub Pages from a public repo, so both
-  hosting and Actions are free at this scale. No server, no database, no paid API
-  in the running app, nothing to patch, host, or rotate.
+  hosting and Actions are free at this scale. The running app has
+  no server, database or paid API to patch, host, or rotate.
 - **Your friends cost you nothing.** Everything runs in *their* browser:
   text-to-speech uses their device's own Cantonese voice, and speech scoring runs
   in their browser too (desktop: Chrome's built-in recognition; iPhone: a small
@@ -253,7 +253,7 @@ cron (06:00 HKT) to refresh the news.
   re-enable it once in the repo's **Actions** tab.)
 - **What can break, and how it fails safe.** The daily build depends on RTHK's
   public feeds. If RTHK changes them, the build **fails soft.** The site serves
-  the bundled *sample* lessons instead of going blank. A glance at the banner
+  the bundled *sample* lessons so the page never goes blank. A glance at the banner
   (it shows today's date) confirms it's healthy.
 - **What your friends need.** For playback: a Cantonese voice on their device:
   Apple devices include "Sinji"; some Windows/Android setups don't, in which case
@@ -324,4 +324,4 @@ tests/           node:test unit tests + Playwright e2e
 
 See [`CANTONESE_FINANCE_LEARNER_OVERVIEW.md`](./CANTONESE_FINANCE_LEARNER_OVERVIEW.md)
 for the original project brief (note: the built app differs from that spec in
-several places. This README describes what was actually built).
+several places. This README describes the app as built).
